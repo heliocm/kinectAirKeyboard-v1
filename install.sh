@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# Based on - https://www.kdab.com/setting-up-kinect-for-programming-in-linux-part-1/
 # To operate Kinect we need 2 drivers
 # To control LED and tilt motor we use freenect
 # http://openkinect.org
