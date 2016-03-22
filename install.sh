@@ -39,11 +39,24 @@ sudo apt-get update
 sudo apt-get install sun-java6-jdk
 
 sudo apt-get install doxygen mono-complete graphviz
+sudo apt-get install aplay
+
+
+# edit license file SensorKinect/OpenNI/Data/SamplesConfig.xml
+<License vendor=”PrimeSense” key=”0KOIk2JeIBYClPWVnMoRKn5cdY4=”/>
+# sample of modified file
+	<Licenses>
+		<!-- Add application-specific licenses here 
+		<License vendor="vendor" key="key"/>
+		-->		
+		<License vendor=”PrimeSense” key=”0KOIk2JeIBYClPWVnMoRKn5cdY4=”/>
+	</Licenses>
+
 
 
 # Install openKinect (libFreenect)
-
 # in libfreenect directory, in the KinectLibs dir
+cd libFreenect
 mkdir build
 cd build
 cmake ..
@@ -51,14 +64,61 @@ make
 sudo make install
 sudo ldconfig /usr/local/lib64/
 
+# Install OpenNI
+cd OpenNI/Platform/Linux/CreateRedist
+chmod 755 RedistMaker
+sudo ./RedistMaker
+cd ../Redist/OpenNI-Bin-Dev-Linux-x64-v1.5.7.10
+sudo ./install.sh
+
+# Install SensorKinect
+cd SensorKinect/Platform/Linux/CreateRedist
+chmod 755 RedistMaker
+sudo ./RedistMaker
+cd ../Redist/Sensor-Bin-Linux-x64-v5.1.2.1/
+sudo ./install.sh
  
+# Install NITE
+cd NITE
+sudo ./install.sh
+
+
 
 # Once libFreenect is installed, plug the Kinect, then set permission to R/W on the usb devices (motor and camera).
-
 sudo chmod a+rw /dev/bus/usb//
 sudo chmod a+rw /dev/bus/usb//
 
-lsusb | grep Xbox
+# list usb devices connected
+$ lsusb | grep Xbox
+Bus 001 Device 008: ID 045e:02ae Microsoft Corp. Xbox NUI Camera
+Bus 001 Device 006: ID 045e:02b0 Microsoft Corp. Xbox NUI Motor
+Bus 001 Device 007: ID 045e:02ad Microsoft Corp. Xbox NUI Audio
+
+
+# testing 
+cd OpenNI/Platform/Linux/Bin/x64-Release
+./Sample-NiSimpleViewer
+
+
+# building kinectKeyboards
+cd OpenNI/Platform/Linux/Build/Samples/kinectKeyboards
+make
+
+
+
+# the code is in the folde below
+cd OpenNI/Samples/kinectKeyboards
+
+# run sample
+cd OpenNI/Platform/Linux/Bin/x64-Release
+./Sample-kinectKeyboards
+
+# extra libs
+https://www.dropbox.com/sh/jsygeyx8dwa49w6/AAA-XmOWcz9svJBZQ_VKMS3ha
+
+
+
+
 
 #libusb couldn't open USB device /dev/bus/usb/001/006: Permission denied.
 #libusb requires write access to USB device nodes.
