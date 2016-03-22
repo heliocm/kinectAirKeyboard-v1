@@ -1,0 +1,9 @@
+gabriel@ubuntu:~/Kinect$ 
+
+
+sudo g++ Triangle.cpp -lglut -lGL -lGLU -o Opengltriangle
+
+
+
+sudo g++ 4buton.cpp -I ~/Kinect/libfreenect/include -lncurses -lfreenect -lX11 -lXtst -lglut -lGL -lGLU -lpthread -o lasttest
+

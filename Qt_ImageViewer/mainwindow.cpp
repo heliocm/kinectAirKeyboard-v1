@@ -1,0 +1,118 @@
+#include "mainwindow.h"
+#include "ui_mainwindow.h"
+#include <QKeyEvent>
+#include <dirent.h>
+MainWindow::MainWindow(QWidget *parent) :
+    QMainWindow(parent),
+    ui(new Ui::MainWindow)
+{
+    root = new ImageFile("starter",NULL);
+    try{
+        getFiles(root);
+    }
+    catch(BinNotFoundException e){
+        delete ui;
+    }
+    ui->setupUi(this);
+
+    QImage imageF((root->getBin()+files.front()->getName(true)).c_str());
+    ui->name->setText(files.front()->getName(false).c_str());
+    ui->picture->setPixmap(QPixmap::fromImage(imageF));
+}
+
+void MainWindow::getFiles(ImageFile* f){
+    DIR*     dir;
+    dirent*  pdir;
+    dir = opendir(f->getBin().c_str());
+    if(!dir)
+        throw BinNotFoundException();
+    string temp;
+    while(!files.empty()){
+        delete files.front();
+        files.pop_front();
+    }
+    while((pdir = readdir(dir))){
+        temp = pdir->d_name;
+        if (!(*(temp.end()-2) == '.' && *(temp.end()-1) == 'b')&&!(*(temp.end()-1)=='.')){
+            files.push_front(new ImageFile(temp,f));
+        }
+    }
+    if(files.empty())
+        delete ui;
+}
+
+void MainWindow::resizeEvent(QResizeEvent* event){
+    QMainWindow::resizeEvent(event);
+    QSize pixSize = ui->picture->pixmap()->size();
+    pixSize.scale(size(),Qt::KeepAspectRatio);
+    ui->picture->setFixedSize(pixSize);
+    ui->name->setGeometry(ui->centralWidget->width()/2-441/2,0,441,21);
+    ui->picture->setGeometry((ui->centralWidget->width()-ui->picture->width())/2,
+                             ui->picture->y(),ui->picture->width(),ui->picture->height());
+}
+
+void MainWindow::keyPressEvent(QKeyEvent * e){
+    if(e->key() == Qt::Key_A){
+        ImageFile* temp = files.back();
+        files.pop_back();
+        files.push_front(temp);
+        QImage imageF((root->getBin()+files.front()->getName(true)).c_str());
+        ui->name->setText(files.front()->getName(false).c_str());
+        ui->picture->setPixmap(QPixmap::fromImage(imageF));
+    }
+    else if(e->key() == Qt::Key_D){
+        ImageFile* temp = files.front();
+        files.pop_front();
+        files.push_back(temp);
+        QImage imageF((root->getBin()+files.front()->getName(true)).c_str());
+        ui->name->setText(files.front()->getName(false).c_str());
+        ui->picture->setPixmap(QPixmap::fromImage(imageF));
+    }
+    else if(e->key() == Qt::Key_S){
+        if(root->getBefore()){
+            string temp1 = root->getName(true);
+            ImageFile* temp2 = root;
+            root = root->getBefore();
+            delete temp2;
+            getFiles(root);
+            while(temp1 != files.front()->getName(true)){
+                temp2 = files.front();
+                files.pop_front();
+                files.push_back(temp2);
+            }
+            QImage imageF((root->getBin()+files.front()->getName(true)).c_str());
+            ui->name->setText(files.front()->getName(false).c_str());
+            ui->picture->setPixmap(QPixmap::fromImage(imageF));
+        }
+    }
+    else if( e->key() == Qt::Key_W){
+        ImageFile* temp = files.front();
+        try{
+            files.pop_front();
+            getFiles(temp);
+            root = temp;
+            QImage imageF((root->getBin()+files.front()->getName(true)).c_str());
+            ui->name->setText(files.front()->getName(false).c_str());
+            ui->picture->setPixmap(QPixmap::fromImage(imageF));
+        }
+        catch(BinNotFoundException e){
+            files.push_front(temp);
+        }
+        return;
+    }
+}
+
+MainWindow::~MainWindow()
+{
+    while(files.empty()){
+        delete files.front();
+        files.pop_front();
+    }
+    ImageFile* temp;
+    while(root){
+        temp = root;
+        root = root->getBefore();
+        delete temp;
+    }
+    delete ui;
+}
