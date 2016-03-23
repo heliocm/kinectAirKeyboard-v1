@@ -1,9 +1,8 @@
-# KinectLinux
-Using Kinect and linux, some virtual buttons control an image scroll
+# kinectAirKeyboard-v1
+Using Kinect and linux, we could have a sort of a musical keyboard to play!
 
-# Demonstration videos
-https://youtu.be/JoXTGzn7QSY<br>
-https://youtu.be/JdRKwpYJpvM
+# How to test it
+Instructions below:
 
 
 
